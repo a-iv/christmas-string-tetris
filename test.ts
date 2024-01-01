@@ -118,6 +118,7 @@ function testGetRotatedFigure() {
 }
 
 function testGetCollapsedField() {
+    collapsedLines = 0
     assertArrayEquals(getCollapsedField([
         [0, 2, 2, 2, 2, 0],
         [2, 0, 0, 0, 0, 2],
@@ -139,6 +140,7 @@ function testGetCollapsedField() {
         [2, 0, 4, 0, 0, 2],
         [0, 2, 2, 2, 2, 0],
     ])
+    control.assert(collapsedLines == 2)
 }
 
 function testGetNumberOfTopEmptyRows() {
@@ -176,6 +178,7 @@ function setUpGameTest(field: number[][], figure: number[][], x: number, y: numb
     currentX = x
     currentY = y
     nextFigure = next
+    collapsedLines = 0
 }
 
 function assertChangeFigure(figure: number[][], resultX: number, resultY: number) {
@@ -225,6 +228,7 @@ function testEndMovements() {
         [0, 2, 2, 2, 2, 0],
     ])
     assertArrayEquals(currentFigure, getFigureO())
+    control.assert(collapsedLines == 0)
 
     setUpGameTest([
         [0, 2, 2, 2, 2, 0],
@@ -250,6 +254,7 @@ function testEndMovements() {
         [0, 2, 2, 2, 2, 0],
     ])
     assertArrayEquals(currentFigure, getFigureO())
+    control.assert(collapsedLines == 1)
 }
 
 function testShowField() {

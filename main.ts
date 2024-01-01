@@ -284,6 +284,7 @@ function moveDown() {
 
 function startGame() {
     currentField = getEmptyField()
+    collapsedLines = 0
     generateNextFigureConfiguration()
     changeFigure(getNextFigure())
     showFieldWithFigure()
