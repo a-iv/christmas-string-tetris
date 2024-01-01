@@ -62,8 +62,10 @@ let nextFigure: number[][]
 let nextFigureIndex: number
 let nextRotateCount: number
 let collapsedLines: number
+let isPaused: boolean
 let isGameOver: boolean
 let BASE_DELAY = 500
+let currentTask = 0
 
 function getFieldWidth() {
     return 1 + CHRISTMAS_STRING_WIDTH + 1
@@ -260,7 +262,11 @@ function showFieldWithFigure() {
 }
 
 function canGame(): boolean {
-    return !isGameOver
+    return !isGameOver && !isPaused
+}
+
+function pauseGame() {
+    isPaused = true
 }
 
 function moveLeft() {
@@ -314,9 +320,13 @@ function getDelay(): number {
 }
 
 function startMovingDown() {
+    currentTask += 1
+    let task = currentTask
     control.inBackground(function () {
         while (true) {
             basic.pause(getDelay())
+            if (task != currentTask)
+                break
             moveDown()
         }
     })
@@ -325,6 +335,7 @@ function startMovingDown() {
 function startGame() {
     currentField = getEmptyField()
     collapsedLines = 0
+    isPaused = false
     isGameOver = false
     generateNextFigureConfiguration()
     changeFigure(getNextFigure())
@@ -333,9 +344,18 @@ function startGame() {
     startMovingDown()
 }
 
+function resumeGame() {
+    if (isPaused) {
+        startMovingDown()
+    }
+    isPaused = false
+}
+
 input.onButtonPressed(Button.A, moveLeft)
 input.onButtonPressed(Button.B, moveRight)
 input.onButtonPressed(Button.AB, moveDown)
 input.onLogoEvent(TouchButtonEvent.Pressed, rotate)
+input.onGesture(Gesture.ScreenDown, pauseGame)
+input.onGesture(Gesture.ScreenUp, resumeGame)
 
 startGame()

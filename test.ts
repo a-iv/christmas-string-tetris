@@ -35,6 +35,7 @@ function setUp() {
     christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
     FIGURE_MAPS = [getFigureJMap()]
     FIGURE_COLORS = [getFigureJColor()]
+    currentTask = 0
     BASE_DELAY = 100
 }
 
@@ -175,6 +176,7 @@ function testGetNextFigure() {
 
 function setUpGameTest(field: number[][], figure: number[][], x: number, y: number, next: number[][]) {
     isGameOver = false
+    isPaused = false
     currentField = field
     currentFigure = figure
     currentX = x
@@ -306,7 +308,21 @@ function testCanGame() {
     control.assert(!canGame())
 }
 
+function testPauseGame() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
+    control.assert(canGame())
+
+    setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
+    pauseGame()
+    control.assert(!canGame())
+}
+
 function testMoveLeft() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
+    pauseGame()
+    moveLeft()
+    control.assert(currentX == 2)
+
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
     moveLeft()
     control.assert(currentX == 1)
@@ -317,6 +333,11 @@ function testMoveLeft() {
 }
 
 function testMoveRight() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
+    pauseGame()
+    moveRight()
+    control.assert(currentX == 2)
+
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
     moveRight()
     control.assert(currentX == 3)
@@ -339,6 +360,11 @@ function testRotate() {
         [0, 2, 2, 2, 2, 0],
     ]
     setUpGameTest(field, getFigureJ(), 2, 1, getFigureO())
+    pauseGame()
+    rotate()
+    assertArrayEquals(currentFigure, getFigureJ())
+
+    setUpGameTest(field, getFigureJ(), 2, 1, getFigureO())
     rotate()
     assertArrayEquals(currentFigure, getRotatedFigure(getFigureJ()))
 
@@ -348,6 +374,12 @@ function testRotate() {
 }
 
 function testMoveDown() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 2, 4, getFigureO())
+    pauseGame()
+    moveDown()
+    control.assert(currentY == 4)
+    assertArrayEquals(currentFigure, getFigureJ())
+
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 4, getFigureO())
     moveDown()
     control.assert(currentY == 5)
@@ -379,6 +411,16 @@ function testStartGame() {
     control.assert(canGame())
 }
 
+function testResumeGame() {
+    startGame()
+    control.assert(canGame())
+
+    pauseGame()
+    control.assert(!canGame())
+    resumeGame()
+    control.assert(canGame())
+}
+
 if (RUN_TESTS) {
     setUp()
     testGetEmptyRow()
@@ -397,11 +439,13 @@ if (RUN_TESTS) {
     testShowField()
     testShowFieldWithFigure()
     testCanGame()
+    testPauseGame()
     testMoveLeft()
     testMoveRight()
     testRotate()
     testMoveDown()
     testGetDelay()
     testStartGame()
+    testResumeGame()
     console.log("PASSED")
 }
