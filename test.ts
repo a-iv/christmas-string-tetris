@@ -311,6 +311,7 @@ if (RUN_TESTS) {
     testGetFieldWithFigure()
     testIsFieldPossibleWithFigure()
     testGetRotatedFigure()
+    testGetCollapsedField()
     testGenerateNextFigureConfiguration()
     testGetNextFigure()
     testChangeFigure()
