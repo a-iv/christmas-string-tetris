@@ -35,6 +35,7 @@ function setUp() {
     christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
     FIGURE_MAPS = [getFigureJMap()]
     FIGURE_COLORS = [getFigureJColor()]
+    BASE_DELAY = 100
 }
 
 function assertArrayEquals(array1: any[], array2: any[]) {
@@ -358,6 +359,21 @@ function testMoveDown() {
     assertArrayEquals(currentFigure, getFigureO())
 }
 
+function testGetDelay() {
+    collapsedLines = 0
+    control.assert(getDelay() == 100)
+    collapsedLines = 9
+    control.assert(getDelay() == 100)
+    collapsedLines = 10
+    control.assert(getDelay() == 99)
+    collapsedLines = 100
+    control.assert(getDelay() == 90)
+    collapsedLines = 999
+    control.assert(getDelay() == 1)
+    collapsedLines = 1000
+    control.assert(getDelay() == 100)
+}
+
 function testStartGame() {
     startGame()
     control.assert(canGame())
@@ -385,6 +401,7 @@ if (RUN_TESTS) {
     testMoveRight()
     testRotate()
     testMoveDown()
+    testGetDelay()
     testStartGame()
     console.log("PASSED")
 }

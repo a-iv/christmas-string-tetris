@@ -63,6 +63,7 @@ let nextFigureIndex: number
 let nextRotateCount: number
 let collapsedLines: number
 let isGameOver: boolean
+let BASE_DELAY = 500
 
 function getFieldWidth() {
     return 1 + CHRISTMAS_STRING_WIDTH + 1
@@ -307,6 +308,20 @@ function moveDown() {
     showFieldWithFigure()
 }
 
+function getDelay(): number {
+    let level = Math.floor(collapsedLines / 10) % 100
+    return BASE_DELAY * (100 - level) / 100
+}
+
+function startMovingDown() {
+    control.inBackground(function () {
+        while (true) {
+            basic.pause(getDelay())
+            moveDown()
+        }
+    })
+}
+
 function startGame() {
     currentField = getEmptyField()
     collapsedLines = 0
@@ -315,6 +330,7 @@ function startGame() {
     changeFigure(getNextFigure())
     christmasString.setBrightness(MAX_BRIGHTNESS)
     showFieldWithFigure()
+    startMovingDown()
 }
 
 input.onButtonPressed(Button.A, moveLeft)
