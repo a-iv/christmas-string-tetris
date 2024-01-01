@@ -192,6 +192,19 @@ function getCollapsedField(field: number[][]): number[][] {
     return resultField
 }
 
+function getNumberOfTopEmptyRows(figure: number[][]): number {
+    let width = getFigureWidth(figure)
+    let height = getFigureHeight(figure)
+    for (let row = 0; row < height; row++) {
+        for (let column = 0; column < width; column++) {
+            if (figure[row][column] != BACKGROUND_COLOR) {
+                return row
+            }
+        }
+    }
+    return height
+}
+
 function generateNextFigureConfiguration() {
     nextFigureIndex += 1
     if (nextFigureIndex >= FIGURE_MAPS.length) {
@@ -213,7 +226,7 @@ function getNextFigure(): number[][] {
 function changeFigure(figure: number[][]) {
     currentFigure = figure
     currentX = Math.floor((getFieldWidth() - getFigureWidth(currentFigure) + 1) / 2)
-    currentY = 1
+    currentY = 1 - getNumberOfTopEmptyRows(currentFigure)
     generateNextFigureConfiguration()
     nextFigure = getNextFigure()
 }
