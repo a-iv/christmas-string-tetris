@@ -361,5 +361,20 @@ input.onButtonPressed(Button.AB, moveDown)
 input.onLogoEvent(TouchButtonEvent.Pressed, rotate)
 input.onGesture(Gesture.ScreenDown, pauseGame)
 input.onGesture(Gesture.ScreenUp, resumeGame)
+radio.onReceivedNumber(function (receivedNumber) {
+    if (receivedNumber == 4) {
+        moveLeft()
+    } else if (receivedNumber == 6) {
+        moveRight()
+    } else if (receivedNumber == 2) {
+        moveDown()
+    } else if (receivedNumber == 5) {
+        rotate()
+    } else if (receivedNumber == 0) {
+        pauseGame()
+    } else if (receivedNumber == 9) {
+        resumeGame()
+    }
+})
 
 startGame()
