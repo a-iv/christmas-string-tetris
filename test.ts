@@ -97,15 +97,42 @@ function testIsFieldPossibleWithFigure() {
     control.assert(!isFieldPossibleWithFigure(getEmptyField(), getFigureJ(), 1, 6), "Bottom border")
 }
 
+function testGetRotatedFigure() {
+    assertArrayEquals(getRotatedFigure(getFigureJ()), [
+        [3, 0, 0],
+        [3, 3, 3],
+        [0, 0, 0]
+    ])
+    assertArrayEquals(getRotatedFigure(getRotatedFigure(getFigureJ())), [
+        [0, 3, 3],
+        [0, 3, 0],
+        [0, 3, 0]
+    ])
+    assertArrayEquals(getRotatedFigure(getRotatedFigure(getRotatedFigure(getFigureJ()))), [
+        [0, 0, 0],
+        [3, 3, 3],
+        [0, 0, 3]
+    ])
+    assertArrayEquals(
+        getRotatedFigure(getRotatedFigure(getRotatedFigure(getRotatedFigure(getFigureJ())))), getFigureJ())
+}
+
 function testGenerateNextFigureConfiguration() {
     nextFigureIndex = 0
+    nextRotateCount = 0
     generateNextFigureConfiguration()
     control.assert(nextFigureIndex >= 0 && nextFigureIndex < FIGURE_MAPS.length)
+    control.assert(nextRotateCount >= 0 && nextRotateCount < 4)
 }
 
 function testGetNextFigure() {
     nextFigureIndex = 0
+    nextRotateCount = 0
     assertArrayEquals(getNextFigure(), getFigureJ())
+
+    nextFigureIndex = 0
+    nextRotateCount = 1
+    assertArrayEquals(getNextFigure(), getRotatedFigure(getFigureJ()))
 }
 
 function setUpGameTest(field: number[][], figure: number[][], x: number, y: number, next: number[][]) {
@@ -189,6 +216,27 @@ function testMoveRight() {
     control.assert(currentX == 3, "Right border")
 }
 
+function testRotate() {
+    let field = [
+        [0, 2, 2, 2, 2, 0],
+        [2, 4, 0, 0, 0, 2],
+        [2, 4, 0, 0, 0, 2],
+        [2, 4, 0, 0, 4, 2],
+        [2, 4, 0, 0, 4, 2],
+        [2, 4, 0, 0, 4, 2],
+        [2, 4, 0, 0, 4, 2],
+        [2, 4, 0, 0, 4, 2],
+        [0, 2, 2, 2, 2, 0],
+    ]
+    setUpGameTest(field, getFigureJ(), 2, 1, getFigureO())
+    rotate()
+    assertArrayEquals(currentFigure, getRotatedFigure(getFigureJ()))
+
+    setUpGameTest(field, getFigureJ(), 2, 2, getFigureO())
+    rotate()
+    assertArrayEquals(currentFigure, getFigureJ())
+}
+
 function testMoveDown() {
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 4, getFigureO())
     moveDown()
@@ -213,6 +261,7 @@ if (RUN_TESTS) {
     testGetColorFigure()
     testGetFieldWithFigure()
     testIsFieldPossibleWithFigure()
+    testGetRotatedFigure()
     testGenerateNextFigureConfiguration()
     testGetNextFigure()
     testChangeFigure()
@@ -221,6 +270,7 @@ if (RUN_TESTS) {
     testShowFieldWithFigure()
     testMoveLeft()
     testMoveRight()
+    testRotate()
     testMoveDown()
     testStartGame()
     console.log("PASSED")

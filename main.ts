@@ -57,6 +57,7 @@ let currentX: number
 let currentY: number
 let nextFigure: number[][]
 let nextFigureIndex: number
+let nextRotateCount: number
 
 function getFieldWidth() {
     return 1 + CHRISTMAS_STRING_WIDTH + 1
@@ -153,15 +154,38 @@ function isFieldPossibleWithFigure(field: number[][], figure: number[][], x: num
     return true
 }
 
+function getRotatedFigure(figure: number[][]): number[][] {
+    let resultFigure: number[][] = []
+    let figureHeight = getFigureHeight(figure)
+    let resultWidth = getFigureHeight(figure)
+    let resultHeight = getFigureWidth(figure)
+    let resultRow: number[]
+    for (let row = 0; row < resultHeight; row++) {
+        resultRow = []
+        for (let column = 0; column < resultWidth; column++) {
+            resultRow.push(figure[figureHeight - 1 - column][row])
+        }
+        resultFigure.push(resultRow)
+    }
+    return resultFigure
+}
+
 function generateNextFigureConfiguration() {
     nextFigureIndex += 1
     if (nextFigureIndex >= FIGURE_MAPS.length) {
         nextFigureIndex = 0
+        nextRotateCount += 1
+        if (nextRotateCount >= 4)
+            nextRotateCount = 0
     }
 }
 
 function getNextFigure(): number[][] {
-    return getColorFigure(FIGURE_MAPS[nextFigureIndex], FIGURE_COLORS[nextFigureIndex])
+    let result = getColorFigure(FIGURE_MAPS[nextFigureIndex], FIGURE_COLORS[nextFigureIndex])
+    for (let index = 0; index < nextRotateCount; index++) {
+        result = getRotatedFigure(result)
+    }
+    return result
 }
 
 function changeFigure(figure: number[][]) {
@@ -210,6 +234,14 @@ function moveRight() {
     }
 }
 
+function rotate() {
+    let rotatedFigure = getRotatedFigure(currentFigure)
+    if (isFieldPossibleWithFigure(currentField, rotatedFigure, currentX, currentY)) {
+        currentFigure = rotatedFigure
+        showFieldWithFigure()
+    }
+}
+
 function moveDown() {
     if (isFieldPossibleWithFigure(currentField, currentFigure, currentX, currentY + 1)) {
         currentY += 1
@@ -229,5 +261,6 @@ function startGame() {
 input.onButtonPressed(Button.A, moveLeft)
 input.onButtonPressed(Button.B, moveRight)
 input.onButtonPressed(Button.AB, moveDown)
+input.onLogoEvent(TouchButtonEvent.Pressed, rotate)
 
 startGame()
