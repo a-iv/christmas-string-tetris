@@ -58,6 +58,7 @@ let currentY: number
 let nextFigure: number[][]
 let nextFigureIndex: number
 let nextRotateCount: number
+let collapsedLines: number
 
 function getFieldWidth() {
     return 1 + CHRISTMAS_STRING_WIDTH + 1
@@ -170,6 +171,27 @@ function getRotatedFigure(figure: number[][]): number[][] {
     return resultFigure
 }
 
+function getCollapsedField(field: number[][]): number[][] {
+    let resultField: number[][] = []
+    for (let row = 0; row < getFieldHeight(); row++) {
+        let hasEmpty = false
+        for (let column = 0; column < getFieldWidth(); column++) {
+            if (field[row][column] == BACKGROUND_COLOR) {
+                hasEmpty = true
+                break;
+            }
+        }
+        if (hasEmpty) {
+            resultField.push(field[row])
+        }
+    }
+    while (resultField.length < getFieldHeight()) {
+        resultField.insertAt(1, getEmptyRow(BORDER_COLOR, BACKGROUND_COLOR))
+        collapsedLines += 1
+    }
+    return resultField
+}
+
 function generateNextFigureConfiguration() {
     nextFigureIndex += 1
     if (nextFigureIndex >= FIGURE_MAPS.length) {
@@ -198,6 +220,7 @@ function changeFigure(figure: number[][]) {
 
 function endMovements() {
     currentField = getFieldWithFigure(currentField, currentFigure, currentX, currentY)
+    currentField = getCollapsedField(currentField)
     changeFigure(nextFigure)
 }
 
