@@ -345,10 +345,14 @@ function startGame() {
 }
 
 function resumeGame() {
-    if (isPaused) {
-        startMovingDown()
+    if (isGameOver) {
+        startGame()
+    } else {
+        if (isPaused) {
+            startMovingDown()
+        }
+        isPaused = false
     }
-    isPaused = false
 }
 
 input.onButtonPressed(Button.A, moveLeft)

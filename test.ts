@@ -419,6 +419,13 @@ function testResumeGame() {
     control.assert(!canGame())
     resumeGame()
     control.assert(canGame())
+
+    for (let i = 0; i < 100; i++) {
+        moveDown()
+    }
+    control.assert(!canGame())
+    resumeGame()
+    control.assert(canGame())
 }
 
 if (RUN_TESTS) {
