@@ -173,6 +173,7 @@ function testGetNextFigure() {
 }
 
 function setUpGameTest(field: number[][], figure: number[][], x: number, y: number, next: number[][]) {
+    isGameOver = false
     currentField = field
     currentFigure = figure
     currentX = x
@@ -229,6 +230,7 @@ function testEndMovements() {
     ])
     assertArrayEquals(currentFigure, getFigureO())
     control.assert(collapsedLines == 0)
+    control.assert(!isGameOver)
 
     setUpGameTest([
         [0, 2, 2, 2, 2, 0],
@@ -255,6 +257,34 @@ function testEndMovements() {
     ])
     assertArrayEquals(currentFigure, getFigureO())
     control.assert(collapsedLines == 1)
+    control.assert(!isGameOver)
+
+    setUpGameTest([
+        [0, 2, 2, 2, 2, 0],
+        [2, 0, 0, 0, 0, 2],
+        [2, 0, 0, 4, 0, 2],
+        [2, 0, 0, 4, 0, 2],
+        [2, 0, 4, 4, 4, 2],
+        [2, 4, 4, 4, 0, 2],
+        [2, 0, 4, 4, 4, 2],
+        [2, 4, 4, 4, 0, 2],
+        [0, 2, 2, 2, 2, 0],
+    ], getFigureJ(), 1, 1, getFigureO())
+    endMovements()
+    assertArrayEquals(currentField, [
+        [0, 2, 2, 2, 2, 0],
+        [2, 0, 3, 0, 0, 2],
+        [2, 0, 3, 4, 0, 2],
+        [2, 3, 3, 4, 0, 2],
+        [2, 0, 4, 4, 4, 2],
+        [2, 4, 4, 4, 0, 2],
+        [2, 0, 4, 4, 4, 2],
+        [2, 4, 4, 4, 0, 2],
+        [0, 2, 2, 2, 2, 0],
+    ])
+    assertArrayEquals(currentFigure, getFigureO())
+    control.assert(collapsedLines == 0)
+    control.assert(isGameOver)
 }
 
 function testShowField() {
@@ -264,6 +294,15 @@ function testShowField() {
 function testShowFieldWithFigure() {
     setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
     showFieldWithFigure()
+}
+
+function testCanGame() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
+    control.assert(canGame())
+
+    setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
+    isGameOver = true
+    control.assert(!canGame())
 }
 
 function testMoveLeft() {
@@ -321,6 +360,7 @@ function testMoveDown() {
 
 function testStartGame() {
     startGame()
+    control.assert(canGame())
 }
 
 if (RUN_TESTS) {
@@ -340,6 +380,7 @@ if (RUN_TESTS) {
     testEndMovements()
     testShowField()
     testShowFieldWithFigure()
+    testCanGame()
     testMoveLeft()
     testMoveRight()
     testRotate()

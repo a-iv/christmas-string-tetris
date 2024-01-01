@@ -1,3 +1,6 @@
+let MAX_BRIGHTNESS = 255
+let GAMEOVER_BRIGHTNESS = 3
+
 let CHRISTMAS_STRING_HEIGHT = 20
 let CHRISTMAS_STRING_WIDTH = 10
 let christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
@@ -59,6 +62,7 @@ let nextFigure: number[][]
 let nextFigureIndex: number
 let nextRotateCount: number
 let collapsedLines: number
+let isGameOver: boolean
 
 function getFieldWidth() {
     return 1 + CHRISTMAS_STRING_WIDTH + 1
@@ -230,6 +234,9 @@ function endMovements() {
     currentField = getFieldWithFigure(currentField, currentFigure, currentX, currentY)
     currentField = getCollapsedField(currentField)
     changeFigure(nextFigure)
+    if (!isFieldPossibleWithFigure(currentField, currentFigure, currentX, currentY)) {
+        isGameOver = true
+    }
 }
 
 function showField(field: number[][]) {
@@ -251,7 +258,14 @@ function showFieldWithFigure() {
     showField(getFieldWithFigure(currentField, currentFigure, currentX, currentY))
 }
 
+function canGame(): boolean {
+    return !isGameOver
+}
+
 function moveLeft() {
+    if (!canGame()) {
+        return
+    }
     if (isFieldPossibleWithFigure(currentField, currentFigure, currentX - 1, currentY)) {
         currentX -= 1
         showFieldWithFigure()
@@ -259,6 +273,9 @@ function moveLeft() {
 }
 
 function moveRight() {
+    if (!canGame()) {
+        return
+    }
     if (isFieldPossibleWithFigure(currentField, currentFigure, currentX + 1, currentY)) {
         currentX += 1
         showFieldWithFigure()
@@ -266,6 +283,9 @@ function moveRight() {
 }
 
 function rotate() {
+    if (!canGame()) {
+        return
+    }
     let rotatedFigure = getRotatedFigure(currentFigure)
     if (isFieldPossibleWithFigure(currentField, rotatedFigure, currentX, currentY)) {
         currentFigure = rotatedFigure
@@ -274,10 +294,15 @@ function rotate() {
 }
 
 function moveDown() {
+    if (!canGame()) {
+        return
+    }
     if (isFieldPossibleWithFigure(currentField, currentFigure, currentX, currentY + 1)) {
         currentY += 1
     } else {
         endMovements()
+        if (isGameOver)
+            christmasString.setBrightness(GAMEOVER_BRIGHTNESS)
     }
     showFieldWithFigure()
 }
@@ -285,8 +310,10 @@ function moveDown() {
 function startGame() {
     currentField = getEmptyField()
     collapsedLines = 0
+    isGameOver = false
     generateNextFigureConfiguration()
     changeFigure(getNextFigure())
+    christmasString.setBrightness(MAX_BRIGHTNESS)
     showFieldWithFigure()
 }
 
