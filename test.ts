@@ -155,8 +155,6 @@ function testGetNumberOfTopEmptyRows() {
 }
 
 function testGenerateNextFigureConfiguration() {
-    nextFigureIndex = 0
-    nextRotateCount = 0
     generateNextFigureConfiguration()
     control.assert(nextFigureIndex >= 0 && nextFigureIndex < FIGURE_MAPS.length)
     control.assert(nextRotateCount >= 0 && nextRotateCount < 4)

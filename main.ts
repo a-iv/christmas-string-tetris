@@ -206,13 +206,8 @@ function getNumberOfTopEmptyRows(figure: number[][]): number {
 }
 
 function generateNextFigureConfiguration() {
-    nextFigureIndex += 1
-    if (nextFigureIndex >= FIGURE_MAPS.length) {
-        nextFigureIndex = 0
-        nextRotateCount += 1
-        if (nextRotateCount >= 4)
-            nextRotateCount = 0
-    }
+    nextFigureIndex = randint(0, FIGURE_MAPS.length - 1)
+    nextRotateCount = randint(0, 4 - 1)
 }
 
 function getNextFigure(): number[][] {
