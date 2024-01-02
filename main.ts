@@ -1,6 +1,7 @@
 let MAX_BRIGHTNESS = 255
 let GAMEOVER_BRIGHTNESS = 3
 
+let CHRISTMAS_STRING_BRIGHTNESS = MAX_BRIGHTNESS
 let CHRISTMAS_STRING_HEIGHT = 20
 let CHRISTMAS_STRING_WIDTH = 10
 let BORDER_COLOR = neopixel.colors(NeoPixelColors.White)
@@ -62,9 +63,90 @@ let MOVE_BPM = 2000
 let ROTATE_MELODY = "C5"
 let ROTATE_BPM = 2000
 
+let INFO_DISPLAY_BRIGHTNESS = 32
+let INFO_DISPLAY_WIDTH = 16
+let INFO_DISPLAY_HEIGHT = 8
+
+let NUMBER_MAPS = [
+    [
+        [0, 1, 1, 1],
+        [0, 1, 0, 1],
+        [0, 1, 0, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1]
+    ], [
+        [0, 0, 0, 1],
+        [0, 0, 1, 1],
+        [0, 0, 0, 1],
+        [0, 0, 0, 1],
+        [0, 0, 0, 1]
+    ], [
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 1, 1, 1],
+        [0, 1, 0, 0],
+        [0, 1, 1, 1]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 1, 1, 1]
+    ],
+    [
+        [0, 1, 0, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 0, 0, 1]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 1, 0, 0],
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 1, 1, 1]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 1, 0, 0],
+        [0, 1, 1, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 0, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1]
+    ],
+    [
+        [0, 1, 1, 1],
+        [0, 1, 0, 1],
+        [0, 1, 1, 1],
+        [0, 0, 0, 1],
+        [0, 1, 1, 1]
+    ]
+]
+let INFO_CELL_WIDTH = 4
+let INFO_CELL_HEIGHT = 5
+let INFO_LOW_COLOR = neopixel.colors(NeoPixelColors.Green)
+let INFO_MIDDLE_COLOR = neopixel.colors(NeoPixelColors.Yellow)
+let INFO_HIGH_COLOR = neopixel.colors(NeoPixelColors.Red)
+
 let BASE_DELAY = 500
 
 let christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
+let infoDisplay = neopixel.create(DigitalPin.P2, INFO_DISPLAY_WIDTH * INFO_DISPLAY_HEIGHT, NeoPixelMode.RGB)
 let currentField: number[][]
 let currentFigure: number[][]
 let currentX: number
@@ -288,6 +370,47 @@ function showFieldWithFigure() {
     showField(getFieldWithFigure(currentField, currentFigure, currentX, currentY))
 }
 
+function showInfoCell(cellIndex: number, figure: number[][]) {
+    for (let row = 0; row < INFO_CELL_HEIGHT; row++) {
+        for (let column = 0; column < INFO_CELL_WIDTH; column++) {
+            let color
+            if (row < getFigureHeight(figure) && column < getFigureWidth(figure)) {
+                color = figure[row][column]
+            } else {
+                color = BACKGROUND_COLOR
+            }
+            infoDisplay.setPixelColor(
+                INFO_DISPLAY_HEIGHT - 1 - row +
+                column * INFO_DISPLAY_HEIGHT +
+                cellIndex * INFO_CELL_WIDTH * INFO_DISPLAY_HEIGHT,
+                color)
+        }
+    }
+}
+
+function getLowCollapsedLinesFigure(): number[][] {
+    let value = collapsedLines % 10
+    return getColorFigure(NUMBER_MAPS[value], INFO_LOW_COLOR)
+}
+
+function getMiddleCollapsedLinesFigure(): number[][] {
+    let value = Math.floor(collapsedLines / 10) % 10
+    return getColorFigure(NUMBER_MAPS[value], collapsedLines < 10 ? BACKGROUND_COLOR : INFO_MIDDLE_COLOR)
+}
+
+function getHighCollapsedLinesFigure(): number[][] {
+    let value = Math.floor(collapsedLines / 100) % 10
+    return getColorFigure(NUMBER_MAPS[value], collapsedLines < 100 ? BACKGROUND_COLOR : INFO_HIGH_COLOR)
+}
+
+function showInfo() {
+    showInfoCell(0, nextFigure)
+    showInfoCell(1, getHighCollapsedLinesFigure())
+    showInfoCell(2, getMiddleCollapsedLinesFigure())
+    showInfoCell(3, getLowCollapsedLinesFigure())
+    infoDisplay.show()
+}
+
 function canGame(): boolean {
     return !isGameOver && !isPaused
 }
@@ -338,8 +461,11 @@ function moveDown() {
         currentY += 1
     } else {
         endMovements()
-        if (isGameOver)
+        if (isGameOver) {
             christmasString.setBrightness(GAMEOVER_BRIGHTNESS)
+            infoDisplay.setBrightness(GAMEOVER_BRIGHTNESS)
+        }
+        showInfo()
     }
     showFieldWithFigure()
 }
@@ -369,8 +495,10 @@ function startGame() {
     isGameOver = false
     generateNextFigureConfiguration()
     changeFigure(getNextFigure())
-    christmasString.setBrightness(MAX_BRIGHTNESS)
+    christmasString.setBrightness(CHRISTMAS_STRING_BRIGHTNESS)
+    infoDisplay.setBrightness(INFO_DISPLAY_BRIGHTNESS)
     showFieldWithFigure()
+    showInfo()
     startMovingDown()
 }
 

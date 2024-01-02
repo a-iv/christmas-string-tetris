@@ -43,7 +43,30 @@ function setUp() {
     MOVE_BPM = 20000
     ROTATE_MELODY = "C5"
     ROTATE_BPM = 20000
+    INFO_DISPLAY_WIDTH = 16
+    INFO_DISPLAY_HEIGHT = 8
+    NUMBER_MAPS = [
+        [
+            [0, 1, 1, 1],
+            [0, 1, 0, 1],
+            [0, 1, 0, 1],
+            [0, 1, 0, 1],
+            [0, 1, 1, 1]
+        ], [
+            [0, 0, 0, 1],
+            [0, 0, 1, 1],
+            [0, 0, 0, 1],
+            [0, 0, 0, 1],
+            [0, 0, 0, 1]
+        ]
+    ]
+    INFO_CELL_WIDTH = 4
+    INFO_CELL_HEIGHT = 5
+    INFO_LOW_COLOR = 2
+    INFO_MIDDLE_COLOR = 3
+    INFO_HIGH_COLOR = 4
     christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
+    infoDisplay = neopixel.create(DigitalPin.P2, INFO_DISPLAY_WIDTH * INFO_DISPLAY_HEIGHT, NeoPixelMode.RGB)
     currentTask = 0
 }
 
@@ -324,6 +347,120 @@ function testShowFieldWithFigure() {
     showFieldWithFigure()
 }
 
+function testShowInfoCell() {
+    showInfoCell(0, getFigureJ())
+}
+
+function assertGetXCollapsedLinesFigure(value: number, high: number[][], middle: number[][], low: number[][]) {
+    collapsedLines = value
+    assertArrayEquals(getHighCollapsedLinesFigure(), high)
+    assertArrayEquals(getMiddleCollapsedLinesFigure(), middle)
+    assertArrayEquals(getLowCollapsedLinesFigure(), low)
+}
+
+function testGetXCollapsedLinesFigure() {
+    assertGetXCollapsedLinesFigure(0, [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ], [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ], [
+        [0, 2, 2, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 2, 2]
+    ])
+    assertGetXCollapsedLinesFigure(1, [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ], [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ], [
+        [0, 0, 0, 2],
+        [0, 0, 2, 2],
+        [0, 0, 0, 2],
+        [0, 0, 0, 2],
+        [0, 0, 0, 2]
+    ])
+    assertGetXCollapsedLinesFigure(10, [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ], [
+        [0, 0, 0, 3],
+        [0, 0, 3, 3],
+        [0, 0, 0, 3],
+        [0, 0, 0, 3],
+        [0, 0, 0, 3]
+    ], [
+        [0, 2, 2, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 2, 2]
+    ])
+    assertGetXCollapsedLinesFigure(100, [
+        [0, 0, 0, 4],
+        [0, 0, 4, 4],
+        [0, 0, 0, 4],
+        [0, 0, 0, 4],
+        [0, 0, 0, 4]
+    ], [
+        [0, 3, 3, 3],
+        [0, 3, 0, 3],
+        [0, 3, 0, 3],
+        [0, 3, 0, 3],
+        [0, 3, 3, 3]
+    ], [
+        [0, 2, 2, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 2, 2]
+    ])
+    assertGetXCollapsedLinesFigure(1000, [
+        [0, 4, 4, 4],
+        [0, 4, 0, 4],
+        [0, 4, 0, 4],
+        [0, 4, 0, 4],
+        [0, 4, 4, 4]
+    ], [
+        [0, 3, 3, 3],
+        [0, 3, 0, 3],
+        [0, 3, 0, 3],
+        [0, 3, 0, 3],
+        [0, 3, 3, 3]
+    ], [
+        [0, 2, 2, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 0, 2],
+        [0, 2, 2, 2]
+    ])
+}
+
+function testShowInfo() {
+    setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
+    showInfo()
+}
+
 function testCanGame() {
     setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO())
     control.assert(canGame())
@@ -483,6 +620,9 @@ if (RUN_TESTS) {
     testEndMovements()
     testShowField()
     testShowFieldWithFigure()
+    testShowInfoCell()
+    testGetXCollapsedLinesFigure()
+    testShowInfo()
     testCanGame()
     testPauseGame()
     testMoveLeft()
