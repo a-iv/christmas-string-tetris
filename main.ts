@@ -54,6 +54,15 @@ let FIGURE_COLORS = [
     neopixel.colors(NeoPixelColors.Red)
 ]
 
+let COLLAPSE_LINE_MELODY = "G C5"
+let COLLAPSE_LINE_BPM = 800
+let NEXT_FIGURE_MELODY = "G C"
+let NEXT_FIGURE_BPM = 800
+let MOVE_MELODY = "C"
+let MOVE_BPM = 2000
+let ROTATE_MELODY = "C5"
+let ROTATE_BPM = 2000
+
 let currentField: number[][]
 let currentFigure: number[][]
 let currentX: number
@@ -64,6 +73,8 @@ let nextRotateCount: number
 let collapsedLines: number
 let isPaused: boolean
 let isGameOver: boolean
+let lastMelody: string
+let lastBPM: number
 let BASE_DELAY = 500
 let currentTask = 0
 
@@ -192,6 +203,9 @@ function getCollapsedField(field: number[][]): number[][] {
             resultField.push(field[row])
         }
     }
+    if (resultField.length == getFieldHeight()) {
+        return field
+    }
     while (resultField.length < getFieldHeight()) {
         resultField.insertAt(1, getEmptyRow(BORDER_COLOR, BACKGROUND_COLOR))
         collapsedLines += 1
@@ -233,9 +247,21 @@ function changeFigure(figure: number[][]) {
     nextFigure = getNextFigure()
 }
 
+function playMusic(melody: string, bpm: number) {
+    lastMelody = melody
+    lastBPM = bpm
+    music.play(music.stringPlayable(melody, bpm), music.PlaybackMode.InBackground)
+}
+
 function endMovements() {
     currentField = getFieldWithFigure(currentField, currentFigure, currentX, currentY)
-    currentField = getCollapsedField(currentField)
+    let resultField = getCollapsedField(currentField)
+    if (currentField == resultField) {
+        playMusic(NEXT_FIGURE_MELODY, NEXT_FIGURE_BPM)
+    } else {
+        playMusic(COLLAPSE_LINE_MELODY, COLLAPSE_LINE_BPM)
+        currentField = resultField
+    }
     changeFigure(nextFigure)
     if (!isFieldPossibleWithFigure(currentField, currentFigure, currentX, currentY)) {
         isGameOver = true
@@ -277,6 +303,7 @@ function moveLeft() {
         currentX -= 1
         showFieldWithFigure()
     }
+    playMusic(MOVE_MELODY, MOVE_BPM)
 }
 
 function moveRight() {
@@ -287,6 +314,7 @@ function moveRight() {
         currentX += 1
         showFieldWithFigure()
     }
+    playMusic(MOVE_MELODY, MOVE_BPM)
 }
 
 function rotate() {
@@ -298,6 +326,7 @@ function rotate() {
         currentFigure = rotatedFigure
         showFieldWithFigure()
     }
+    playMusic(ROTATE_MELODY, ROTATE_BPM)
 }
 
 function moveDown() {

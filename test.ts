@@ -37,6 +37,14 @@ function setUp() {
     FIGURE_COLORS = [getFigureJColor()]
     currentTask = 0
     BASE_DELAY = 100
+    COLLAPSE_LINE_MELODY = "G C5"
+    COLLAPSE_LINE_BPM = 8000
+    NEXT_FIGURE_MELODY = "G C"
+    NEXT_FIGURE_BPM = 8000
+    MOVE_MELODY = "C"
+    MOVE_BPM = 20000
+    ROTATE_MELODY = "C5"
+    ROTATE_BPM = 20000
 }
 
 function assertArrayEquals(array1: any[], array2: any[]) {
@@ -183,6 +191,8 @@ function setUpGameTest(field: number[][], figure: number[][], x: number, y: numb
     currentY = y
     nextFigure = next
     collapsedLines = 0
+    lastMelody = undefined
+    lastBPM = undefined
 }
 
 function assertChangeFigure(figure: number[][], resultX: number, resultY: number) {
@@ -217,6 +227,18 @@ function testChangeFigure() {
     ], 1, -1)
 }
 
+function assertMusic(melody: string, bpm: number) {
+    control.assert(lastMelody == melody)
+    control.assert(lastBPM == bpm)
+}
+
+function testMusic() {
+    lastMelody = undefined
+    lastBPM = undefined
+    playMusic(COLLAPSE_LINE_MELODY, COLLAPSE_LINE_BPM)
+    assertMusic(COLLAPSE_LINE_MELODY, COLLAPSE_LINE_BPM)
+}
+
 function testEndMovements() {
     setUpGameTest(getEmptyField(), getFigureJ(), 1, 5, getFigureO())
     endMovements()
@@ -234,6 +256,7 @@ function testEndMovements() {
     assertArrayEquals(currentFigure, getFigureO())
     control.assert(collapsedLines == 0)
     control.assert(!isGameOver)
+    assertMusic(NEXT_FIGURE_MELODY, NEXT_FIGURE_BPM)
 
     setUpGameTest([
         [0, 2, 2, 2, 2, 0],
@@ -261,6 +284,7 @@ function testEndMovements() {
     assertArrayEquals(currentFigure, getFigureO())
     control.assert(collapsedLines == 1)
     control.assert(!isGameOver)
+    assertMusic(COLLAPSE_LINE_MELODY, COLLAPSE_LINE_BPM)
 
     setUpGameTest([
         [0, 2, 2, 2, 2, 0],
@@ -288,6 +312,7 @@ function testEndMovements() {
     assertArrayEquals(currentFigure, getFigureO())
     control.assert(collapsedLines == 0)
     control.assert(isGameOver)
+    assertMusic(NEXT_FIGURE_MELODY, NEXT_FIGURE_BPM)
 }
 
 function testShowField() {
@@ -322,14 +347,17 @@ function testMoveLeft() {
     pauseGame()
     moveLeft()
     control.assert(currentX == 2)
+    assertMusic(undefined, undefined)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
     moveLeft()
     control.assert(currentX == 1)
+    assertMusic(MOVE_MELODY, MOVE_BPM)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 1, 1, getFigureO());
     moveLeft()
     control.assert(currentX == 1, "Left border")
+    assertMusic(MOVE_MELODY, MOVE_BPM)
 }
 
 function testMoveRight() {
@@ -337,14 +365,17 @@ function testMoveRight() {
     pauseGame()
     moveRight()
     control.assert(currentX == 2)
+    assertMusic(undefined, undefined)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 1, getFigureO());
     moveRight()
     control.assert(currentX == 3)
+    assertMusic(MOVE_MELODY, MOVE_BPM)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 3, 1, getFigureO());
     moveRight()
     control.assert(currentX == 3, "Right border")
+    assertMusic(MOVE_MELODY, MOVE_BPM)
 }
 
 function testRotate() {
@@ -363,14 +394,17 @@ function testRotate() {
     pauseGame()
     rotate()
     assertArrayEquals(currentFigure, getFigureJ())
+    assertMusic(undefined, undefined)
 
     setUpGameTest(field, getFigureJ(), 2, 1, getFigureO())
     rotate()
     assertArrayEquals(currentFigure, getRotatedFigure(getFigureJ()))
+    assertMusic(ROTATE_MELODY, ROTATE_BPM)
 
     setUpGameTest(field, getFigureJ(), 2, 2, getFigureO())
     rotate()
     assertArrayEquals(currentFigure, getFigureJ())
+    assertMusic(ROTATE_MELODY, ROTATE_BPM)
 }
 
 function testMoveDown() {
@@ -379,16 +413,19 @@ function testMoveDown() {
     moveDown()
     control.assert(currentY == 4)
     assertArrayEquals(currentFigure, getFigureJ())
+    assertMusic(undefined, undefined)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 4, getFigureO())
     moveDown()
     control.assert(currentY == 5)
     assertArrayEquals(currentFigure, getFigureJ())
+    assertMusic(undefined, undefined)
 
     setUpGameTest(getEmptyField(), getFigureJ(), 2, 5, getFigureO())
     moveDown()
     control.assert(currentY == 1)
     assertArrayEquals(currentFigure, getFigureO())
+    assertMusic(NEXT_FIGURE_MELODY, NEXT_FIGURE_BPM)
 }
 
 function testGetDelay() {
@@ -442,6 +479,7 @@ if (RUN_TESTS) {
     testGenerateNextFigureConfiguration()
     testGetNextFigure()
     testChangeFigure()
+    testMusic()
     testEndMovements()
     testShowField()
     testShowFieldWithFigure()
