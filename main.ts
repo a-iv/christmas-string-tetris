@@ -3,7 +3,6 @@ let GAMEOVER_BRIGHTNESS = 3
 
 let CHRISTMAS_STRING_HEIGHT = 20
 let CHRISTMAS_STRING_WIDTH = 10
-let christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
 let BORDER_COLOR = neopixel.colors(NeoPixelColors.White)
 let BACKGROUND_COLOR = neopixel.colors(NeoPixelColors.Black)
 
@@ -63,6 +62,9 @@ let MOVE_BPM = 2000
 let ROTATE_MELODY = "C5"
 let ROTATE_BPM = 2000
 
+let BASE_DELAY = 500
+
+let christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
 let currentField: number[][]
 let currentFigure: number[][]
 let currentX: number
@@ -75,7 +77,6 @@ let isPaused: boolean
 let isGameOver: boolean
 let lastMelody: string
 let lastBPM: number
-let BASE_DELAY = 500
 let currentTask = 0
 
 function getFieldWidth() {

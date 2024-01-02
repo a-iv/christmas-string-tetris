@@ -32,10 +32,8 @@ function setUp() {
     CHRISTMAS_STRING_HEIGHT = 7
     BORDER_COLOR = 2
     BACKGROUND_COLOR = 0
-    christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
     FIGURE_MAPS = [getFigureJMap()]
     FIGURE_COLORS = [getFigureJColor()]
-    currentTask = 0
     BASE_DELAY = 100
     COLLAPSE_LINE_MELODY = "G C5"
     COLLAPSE_LINE_BPM = 8000
@@ -45,6 +43,8 @@ function setUp() {
     MOVE_BPM = 20000
     ROTATE_MELODY = "C5"
     ROTATE_BPM = 20000
+    christmasString = neopixel.create(DigitalPin.P1, CHRISTMAS_STRING_WIDTH * CHRISTMAS_STRING_HEIGHT, NeoPixelMode.RGB)
+    currentTask = 0
 }
 
 function assertArrayEquals(array1: any[], array2: any[]) {
