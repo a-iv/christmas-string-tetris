@@ -338,6 +338,21 @@ function testEndMovements() {
     assertMusic(NEXT_FIGURE_MELODY, NEXT_FIGURE_BPM)
 }
 
+function testGetPixelNumber() {
+    control.assert(getPixelNumber(0, 0) == 6)
+    control.assert(getPixelNumber(0, 1) == 5)
+    control.assert(getPixelNumber(0, 5) == 1)
+    control.assert(getPixelNumber(0, 6) == 0)
+    control.assert(getPixelNumber(1, 0) == 7)
+    control.assert(getPixelNumber(1, 1) == 8)
+    control.assert(getPixelNumber(1, 5) == 12)
+    control.assert(getPixelNumber(1, 6) == 13)
+    control.assert(getPixelNumber(2, 0) == 20)
+    control.assert(getPixelNumber(2, 1) == 19)
+    control.assert(getPixelNumber(2, 5) == 15)
+    control.assert(getPixelNumber(2, 6) == 14)
+}
+
 function testShowField() {
     showField(getEmptyField())
 }
@@ -618,6 +633,7 @@ if (RUN_TESTS) {
     testChangeFigure()
     testMusic()
     testEndMovements()
+    testGetPixelNumber()
     testShowField()
     testShowFieldWithFigure()
     testShowInfoCell()

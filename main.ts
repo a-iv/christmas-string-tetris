@@ -351,16 +351,20 @@ function endMovements() {
     }
 }
 
+function getPixelNumber(column: number, row: number): number {
+    let shift: number
+    if (column % 2 == 0) {
+        shift = CHRISTMAS_STRING_HEIGHT - 1 - row
+    } else {
+        shift = row
+    }
+    return shift + column * CHRISTMAS_STRING_HEIGHT;
+}
+
 function showField(field: number[][]) {
     for (let row = 0; row < CHRISTMAS_STRING_HEIGHT; row++) {
         for (let column = 0; column < CHRISTMAS_STRING_WIDTH; column++) {
-            let shift: number
-            if (column % 2 == 0) {
-                shift = CHRISTMAS_STRING_HEIGHT - 1 - row
-            } else {
-                shift = row
-            }
-            christmasString.setPixelColor(shift + column * CHRISTMAS_STRING_HEIGHT, field[row + 1][column + 1])
+            christmasString.setPixelColor(getPixelNumber(column, row), field[row + 1][column + 1])
         }
     }
     christmasString.show()
