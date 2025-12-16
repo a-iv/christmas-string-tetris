@@ -353,18 +353,18 @@ function endMovements() {
 
 function getPixelNumber(column: number, row: number): number {
     let shift: number
-    if (column % 2 == 0) {
-        shift = CHRISTMAS_STRING_HEIGHT - 1 - row
+    if (column % 2 == 1) {
+        shift = CHRISTMAS_STRING_HEIGHT - row
     } else {
-        shift = row
+        shift = row - 1
     }
-    return shift + column * CHRISTMAS_STRING_HEIGHT;
+    return shift + (column - 1) * CHRISTMAS_STRING_HEIGHT
 }
 
 function showField(field: number[][]) {
-    for (let row = 0; row < CHRISTMAS_STRING_HEIGHT; row++) {
-        for (let column = 0; column < CHRISTMAS_STRING_WIDTH; column++) {
-            christmasString.setPixelColor(getPixelNumber(column, row), field[row + 1][column + 1])
+    for (let row = 1; row <= CHRISTMAS_STRING_HEIGHT; row++) {
+        for (let column = 1; column <= CHRISTMAS_STRING_WIDTH; column++) {
+            christmasString.setPixelColor(getPixelNumber(column, row), field[row][column])
         }
     }
     christmasString.show()
